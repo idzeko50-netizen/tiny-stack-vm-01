@@ -3,6 +3,11 @@
 // and /output/<id>/exit.txt. Faithful to generator/subject/vm.mjs: 32-bit
 // wrapping ints, 256-value stack, 64-deep call stack, 256 words of memory,
 // ten traps with their own exit codes, 1e6 step limit, 65536 output limit.
+// Trap-check order per step (ISA.md): step limit (10) -> pc range (9) ->
+// unknown opcode (5) -> immediate cut off (9) -> per-opcode stack
+// underflow (2) / overflow (3) -> the op's own traps (div-by-zero 4,
+// memory 6, call depth 7, empty RET 8, output 11). Traps keep all output
+// written before them; a trapping PRINT writes none of its bytes.
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
